@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Zlate",
+  "version": "1.0.0",
+  "description": "Real-time text translation using AI (Gemini, OpenAI, DeepSeek, Claude, Groq)",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "contextMenus"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"]
+    }
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.openai.com/*",
+    "https://api.deepseek.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.groq.com/*"
+  ]
+}

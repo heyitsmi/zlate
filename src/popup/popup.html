@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zlate Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <h1>🌐 Zlate</h1>
+        <span id="licenseBadge" class="license-badge free">Free</span>
+      </div>
+      <button id="themeToggle" class="theme-toggle" title="Toggle theme">🌙</button>
+    </div>
+    
+    <div id="expirationWarning" class="expiration-warning" style="display: none;">
+      ⚠️ Your license expires soon. <a href="#" id="renewLink">Renew now</a>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="settings">Settings</button>
+      <button class="tab" data-tab="history">History</button>
+    </div>
+
+    <div id="settings-tab" class="tab-content active">
+      <div class="form-group">
+        <label for="engine">AI Engine</label>
+        <select id="engine"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="apiKey">API Key</label>
+        <input type="password" id="apiKey" placeholder="Enter your API key">
+        <small id="apiKeyHint"></small>
+      </div>
+
+      <div class="form-group">
+        <label>Languages</label>
+        <div class="lang-swap-container">
+          <select id="sourceLang" class="lang-select"></select>
+          <button id="swapLangBtn" class="swap-btn" title="Swap languages">⇄</button>
+          <select id="targetLang" class="lang-select"></select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tone">Translation Tone</label>
+        <select id="tone"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="theme">Theme</label>
+        <select id="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
+      <div class="form-group license-section">
+        <label for="licenseKey">License Key</label>
+        <div class="license-input-container">
+          <input type="text" id="licenseKey" placeholder="Enter your license key">
+          <button id="validateLicenseBtn" class="validate-btn">Validate</button>
+        </div>
+        <div id="licenseStatus" class="license-status"></div>
+        <small>Enter your license key to unlock Premium features</small>
+      </div>
+
+      <button id="saveBtn">Save Settings</button>
+      <div id="status" class="status"></div>
+      
+      <div class="shortcut-info">
+        <span>⌨️ Shortcut: <strong>Ctrl+Shift+T</strong></span>
+      </div>
+    </div>
+
+    <div id="history-tab" class="tab-content">
+      <div id="history-list" class="history-list"></div>
+      <button id="clearHistoryBtn" class="clear-btn">Clear History</button>
+    </div>
+  </div>
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+/**
+ * Content Script Styles
+ * Tooltip and translation UI styles with dark mode support
+ */
+
+#ai-translator-tooltip {
+  position: absolute;
+  z-index: 2147483647;
+  background: var(--ait-bg, #fff);
+  color: var(--ait-text, #333);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  animation: aitFadeIn 0.15s ease;
+}
+
+#ai-translator-tooltip.dark {
+  --ait-bg: #2d2d2d;
+  --ait-text: #e0e0e0;
+  --ait-border: #444;
+  --ait-muted: #888;
+  --ait-accent: #5a9cf5;
+  --ait-accent-bg: #2d3a4d;
+}
+
+@keyframes aitFadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-translator-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #4285f4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.ai-translator-btn:hover {
+  background: #3367d6;
+}
+
+.shortcut-hint {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+.ai-translator-btn.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.ai-translator-result {
+  max-width: 400px;
+  min-width: 200px;
+  max-height: 300px;
+  padding: 12px 16px;
+  overflow-y: auto;
+}
+
+.ai-translator-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ait-border, #eee);
+}
+
+.ai-translator-result-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ait-muted, #666);
+  text-transform: uppercase;
+}
+
+.ai-translator-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--ait-muted, #999);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.ai-translator-close:hover {
+  color: var(--ait-text, #333);
+}
+
+.ai-translator-text {
+  color: var(--ait-text, #333);
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.ai-translator-error {
+  color: #ef5350;
+}
+
+.ai-translator-copy {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--ait-accent, #4285f4);
+  background: var(--ait-accent-bg, #e8f0fe);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ai-translator-copy:hover {
+  background: var(--ait-accent, #4285f4);
+  color: #fff;
+}
+
+.ai-translator-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: aitSpin 0.8s linear infinite;
+}
+
+@keyframes aitSpin {
+  to { transform: rotate(360deg); }
+}
