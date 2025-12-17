@@ -5,9 +5,30 @@
 (() => {
   let tooltip = null;
   let selectedText = '';
+  let currentTone = 'neutral';
+  let isPremium = false;
+  let cachedSettings = null;
 
   // Get browser API (Chrome/Firefox compatibility)
   const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+
+  // Premium tones available
+  const PREMIUM_TONES = [
+    { id: 'neutral', name: 'Neutral' },
+    { id: 'formal', name: 'Formal' },
+    { id: 'casual', name: 'Casual' },
+    { id: 'friendly', name: 'Friendly' },
+    { id: 'professional', name: 'Professional' },
+    { id: 'academic', name: 'Academic' },
+    { id: 'simple', name: 'Simple' }
+  ];
+
+  // Check premium status
+  async function checkPremiumStatus() {
+    const result = await browserAPI.storage.local.get(['licenseStatus']);
+    isPremium = result.licenseStatus?.isPremium === true;
+    return isPremium;
+  }
 
   async function createTooltip() {
     if (tooltip) return tooltip;
@@ -72,6 +93,19 @@
 
   async function showResult(translation, isError = false) {
     const tip = await createTooltip();
+    await checkPremiumStatus();
+    
+    // Build tone tabs HTML for premium users
+    const toneTabsHtml = isPremium ? `
+      <div class="ai-translator-tones">
+        ${PREMIUM_TONES.map(tone => `
+          <button class="ai-translator-tone-btn ${tone.id === currentTone ? 'active' : ''}" data-tone="${tone.id}">
+            ${tone.name}
+          </button>
+        `).join('')}
+      </div>
+    ` : '';
+    
     tip.innerHTML = `
       <div class="ai-translator-result">
         <div class="ai-translator-result-header">
@@ -79,6 +113,7 @@
           <button class="ai-translator-close">&times;</button>
         </div>
         <div class="ai-translator-text ${isError ? 'ai-translator-error' : ''}">${escapeHtml(translation)}</div>
+        ${!isError ? toneTabsHtml : ''}
         ${!isError ? '<button class="ai-translator-copy">Copy to clipboard</button>' : ''}
       </div>
     `;
@@ -91,6 +126,23 @@
         navigator.clipboard.writeText(translation);
         copyBtn.textContent = 'Copied!';
         setTimeout(() => copyBtn.textContent = 'Copy to clipboard', 2000);
+      });
+    }
+    
+    // Add tone tab click handlers for premium users
+    if (isPremium) {
+      tip.querySelectorAll('.ai-translator-tone-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const newTone = e.target.dataset.tone;
+          if (newTone !== currentTone) {
+            currentTone = newTone;
+            // Update active state
+            tip.querySelectorAll('.ai-translator-tone-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            // Re-translate with new tone
+            await handleTranslateWithTone(newTone);
+          }
+        });
       });
     }
   }
@@ -128,6 +180,8 @@
       const settings = await browserAPI.storage.local.get([
         'engine', 'apiKeys', 'sourceLang', 'targetLang', 'tone'
       ]);
+      cachedSettings = settings;
+      currentTone = settings.tone || 'neutral';
       
       if (!settings.engine || !settings.apiKeys || !settings.apiKeys[settings.engine]) {
         showResult('Please configure your API key in the extension settings.', true);
@@ -141,7 +195,7 @@
         apiKey: settings.apiKeys[settings.engine],
         sourceLang: settings.sourceLang || 'auto',
         targetLang: settings.targetLang || 'en',
-        tone: settings.tone || 'neutral'
+        tone: currentTone
       });
       
       if (response.success) {
@@ -158,6 +212,51 @@
       }
     } catch (error) {
       showResult(error.message || 'Translation failed. Please try again.', true);
+    }
+  }
+
+  async function handleTranslateWithTone(tone) {
+    if (!selectedText || !cachedSettings) return;
+    
+    // Show loading in the text area only
+    const textEl = tooltip?.querySelector('.ai-translator-text');
+    if (textEl) {
+      textEl.innerHTML = '<div class="ai-translator-spinner-inline"></div> Translating...';
+    }
+    
+    try {
+      const response = await browserAPI.runtime.sendMessage({
+        action: 'translate',
+        text: selectedText,
+        engine: cachedSettings.engine,
+        apiKey: cachedSettings.apiKeys[cachedSettings.engine],
+        sourceLang: cachedSettings.sourceLang || 'auto',
+        targetLang: cachedSettings.targetLang || 'en',
+        tone: tone
+      });
+      
+      if (response.success && textEl) {
+        textEl.textContent = response.translation;
+        textEl.classList.remove('ai-translator-error');
+        
+        // Update copy button to copy new translation
+        const copyBtn = tooltip?.querySelector('.ai-translator-copy');
+        if (copyBtn) {
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(response.translation);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => copyBtn.textContent = 'Copy to clipboard', 2000);
+          };
+        }
+      } else if (textEl) {
+        textEl.textContent = response.error || 'Translation failed';
+        textEl.classList.add('ai-translator-error');
+      }
+    } catch (error) {
+      if (textEl) {
+        textEl.textContent = error.message || 'Translation failed';
+        textEl.classList.add('ai-translator-error');
+      }
     }
   }
 
@@ -210,7 +309,7 @@
     }
   });
 
-  document.addEventListener('scroll', removeTooltip);
+  // Note: Removed scroll listener so tooltip stays open when scrolling outside
 
   // Context menu translate handler
   browserAPI.runtime.onMessage.addListener((request, sender, sendResponse) => {
