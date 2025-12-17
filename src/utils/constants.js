@@ -83,6 +83,4 @@ export const LICENSE_STORAGE_KEYS = {
 };
 
 // License API endpoint
-// Update this URL after deploying licence-system to Vercel
-// Example: https://zlate-licence-system.vercel.app
-export const LICENSE_API_BASE_URL = 'https://your-licence-system.vercel.app';
+export const LICENSE_API_BASE_URL = 'https://api-zlate.diaiti.com';
