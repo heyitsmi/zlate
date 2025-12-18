@@ -293,23 +293,15 @@
       selectedText = text;
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
-      showTranslateButton(rect.left + window.scrollX, rect.bottom + window.scrollY);
-    } else {
-      setTimeout(() => {
-        if (!document.querySelector('#ai-translator-tooltip:hover')) {
-          removeTooltip();
-        }
-      }, 100);
+      
+      const hasResultTooltip = tooltip?.querySelector('.ai-translator-result');
+      if (!hasResultTooltip) {
+        showTranslateButton(rect.left + window.scrollX, rect.bottom + window.scrollY);
+      }
     }
   });
 
-  document.addEventListener('mousedown', (e) => {
-    if (!e.target.closest('#ai-translator-tooltip')) {
-      removeTooltip();
-    }
-  });
 
-  // Note: Removed scroll listener so tooltip stays open when scrolling outside
 
   // Context menu translate handler
   browserAPI.runtime.onMessage.addListener((request, sender, sendResponse) => {
